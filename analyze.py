@@ -12,12 +12,15 @@ import math
 # plt.show()
 
 
-data_angles = np.load("data/manualAngles.npy")
+# data_angles = np.load("data/manualAngles.npy")
+front_angles = np.load("data/frontAngles.npy")
+back_angles = np.load("data/backAngles.npy")
+
 
 import matplotlib.pylab as plt
 x = np.linspace(-np.pi, np.pi, 1000)
-plt.plot(x, data_angles, linewidth=3, label="Front leg motor values")
-plt.plot(x, data_angles, linewidth=0.5, label="Back leg motor values")
+plt.plot(x, front_angles, linewidth=3, label="Front leg motor values")
+plt.plot(x, back_angles, linewidth=0.5, label="Back leg motor values")
 plt.legend()
 plt.show()
 

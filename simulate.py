@@ -22,20 +22,35 @@ iterations = 1000
 
 backLegSensorValues = numpy.zeros(iterations)
 frontLegSensorValues = numpy.zeros(iterations)
-target_angles = numpy.zeros(iterations)
+front_target_angles = numpy.zeros(iterations)
+back_target_angles = numpy.zeros(iterations)
 
 angles = numpy.linspace(0, 2 * math.pi, iterations)
 
 # target_angles = math.pi / 4 * numpy.sin(angles)
 
 
-amplitude = math.pi / 4
-frequency = 10 / (iterations / (2 * math.pi))
-phaseOffset = 0
+front_amplitude = math.pi / 8
+front_frequency = 10 / (iterations / (2 * math.pi))
+front_phaseOffset = math.pi / 4
+
+back_amplitude = math.pi / 4
+back_frequency = 10 / (iterations / (2 * math.pi))
+back_phaseOffset = 0
 
 for i in range(0, iterations):
-    target_angle = amplitude * numpy.sin(frequency * i + phaseOffset)
-    target_angles[i] = target_angle
+    front_target_angle = front_amplitude * numpy.sin(front_frequency * i + front_phaseOffset)
+    front_target_angles[i] = front_target_angle
+
+    back_target_angle = back_amplitude * numpy.sin(back_frequency * i + back_phaseOffset)
+    back_target_angles[i] = back_target_angle
+
+# numpy.save("data/frontAngles.npy", front_target_angles)
+# numpy.save("data/backAngles.npy", back_target_angles)
+#
+# exit()
+
+for i in range(0, iterations):
 
     p.stepSimulation()
     backLegSensorValues[i] = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
@@ -49,7 +64,7 @@ for i in range(0, iterations):
         controlMode=p.POSITION_CONTROL,
 
         # targetPosition=-math.pi / 4 + math.pi / 2 * random.random(),
-        targetPosition=target_angles[i],
+        targetPosition=back_target_angles[i],
 
         maxForce=40)
 
@@ -62,7 +77,7 @@ for i in range(0, iterations):
         controlMode=p.POSITION_CONTROL,
 
         # targetPosition=-math.pi / 4 + math.pi / 2 * random.random(),
-        targetPosition=target_angles[i],
+        targetPosition=front_target_angles[i],
 
         maxForce=40)
     # print(backLegTouch)
@@ -71,8 +86,7 @@ for i in range(0, iterations):
 
 p.disconnect()
 
-print(backLegSensorValues)
+# print(backLegSensorValues)
 # numpy.save("data/backLegSensor.npy", backLegSensorValues)
 # numpy.save("data/frontLegSensor.npy", frontLegSensorValues)
-# numpy.save("data/manualAngles.npy", targetAngles)
 
