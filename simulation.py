@@ -23,40 +23,15 @@ class SIMULATION:
         self.run()
 
     def run(self):
-        backLegSensorValues = numpy.zeros(c.ITERATIONS)
-        frontLegSensorValues = numpy.zeros(c.ITERATIONS)
         for i in range(0, c.ITERATIONS):
             p.stepSimulation()
-            backLegSensorValues[i] = pyrosim.Get_Touch_Sensor_Value_For_Link("BackLeg")
-            frontLegSensorValues[i] = pyrosim.Get_Touch_Sensor_Value_For_Link("FrontLeg")
-            pyrosim.Set_Motor_For_Joint(
-
-                bodyIndex=self.robot.robotId,
-
-                jointName=b"Torso_BackLeg",
-
-                controlMode=p.POSITION_CONTROL,
-
-                # targetPosition=-math.pi / 4 + math.pi / 2 * random.random(),
-                targetPosition=self.robot.front_target_angles[i],
-
-                maxForce=c.MAX_FORCE)
-
-            pyrosim.Set_Motor_For_Joint(
-
-                bodyIndex=self.robot.robotId,
-
-                jointName=b"Torso_FrontLeg",
-
-                controlMode=p.POSITION_CONTROL,
-
-                # targetPosition=-math.pi / 4 + math.pi / 2 * random.random(),
-                targetPosition=self.robot.back_target_angles[i],
-
-                maxForce=c.MAX_FORCE)
+            self.robot.Sense(i)
+            self.robot.Act(i)
             # print(backLegTouch)
             time.sleep(1 / 60)
             # print(i)
+
+        # self.robot.Save_Sense()
 
     def __del__(self):
         p.disconnect()
