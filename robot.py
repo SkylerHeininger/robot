@@ -6,6 +6,7 @@ import pyrosim.pyrosim as pyrosim
 import numpy
 import math
 import constants as c
+from pyrosim.neuralNetwork import NEURAL_NETWORK
 
 
 class ROBOT:
@@ -13,6 +14,7 @@ class ROBOT:
         self.p = p
         self.sensors = {}
         self.motors = {}
+        self.nn = NEURAL_NETWORK("brain.nndf")
 
         self.robotId = self.p.loadURDF("body.urdf")
 
@@ -40,5 +42,21 @@ class ROBOT:
             self.motors[jointName] = MOTOR(jointName, self.p)
 
     def Act(self, t):
-        for jointName in pyrosim.jointNamesToIndices:
-            self.motors[jointName].Set_Value(t, self)
+        # for jointName in pyrosim.jointNamesToIndices:
+        #     self.motors[jointName].Set_Value(t, self)
+        for neuronName in self.nn.Get_Neuron_Names():
+            # print(neuronName)
+            if self.nn.Is_Motor_Neuron(neuronName):
+                jointName = self.nn.Get_Motor_Neurons_Joint(neuronName).encode("utf-8")
+                jointName = jointName.decode("utf-8")
+                desiredAngle = self.nn.Get_Value_Of(neuronName)
+                self.motors[jointName].Set_Value(desiredAngle, self)
+                print(neuronName, jointName, desiredAngle)
+
+
+
+    def Think(self):
+        self.nn.Update()
+        self.nn.Print()
+
+

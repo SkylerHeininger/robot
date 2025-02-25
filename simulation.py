@@ -26,6 +26,7 @@ class SIMULATION:
         for i in range(0, c.ITERATIONS):
             p.stepSimulation()
             self.robot.Sense(i)
+            self.robot.Think()
             self.robot.Act(i)
             # print(backLegTouch)
             time.sleep(1 / 60)
