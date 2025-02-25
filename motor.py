@@ -11,22 +11,7 @@ class MOTOR:
         self.frequency = None
         self.phaseoffset = None
         self.target_angles = None
-        self.Prepare_To_Act()
         self.p = p
-
-    def Prepare_To_Act(self):
-        self.amplitude = c.FRONT_A
-        self.frequency = c.FRONT_F
-        self.phaseoffset = c.FRONT_P
-
-        if self.jointName == b'Torso_BackLeg':
-            self.frequency /= 2
-
-        self.target_angles = numpy.zeros(c.ITERATIONS)
-
-        for i in range(0, c.ITERATIONS):
-            target_angle = self.amplitude * numpy.sin(self.frequency * i + self.phaseoffset)
-            self.target_angles[i] = target_angle
 
     def Set_Value(self, desiredAngle, robot):
         pyrosim.Set_Motor_For_Joint(
