@@ -1,3 +1,5 @@
+import os
+
 import pybullet as p
 from sensor import SENSOR
 from motor import MOTOR
@@ -10,11 +12,13 @@ from pyrosim.neuralNetwork import NEURAL_NETWORK
 
 
 class ROBOT:
-    def __init__(self, s, m, p):
+    def __init__(self, s, m, p, simulationID):
         self.p = p
         self.sensors = {}
         self.motors = {}
-        self.nn = NEURAL_NETWORK("brain.nndf")
+        self.nn = NEURAL_NETWORK(f"brain{simulationID}.nndf")
+        self.simId = simulationID
+        os.system(f"del brain{simulationID}.nndf")
 
         self.robotId = self.p.loadURDF("body.urdf")
 
@@ -38,7 +42,7 @@ class ROBOT:
 
     def Prepare_To_Act(self):
         for jointName in pyrosim.jointNamesToIndices:
-            print(jointName)
+            # print(jointName)
             self.motors[jointName] = MOTOR(jointName, self.p)
 
     def Act(self, t):
@@ -55,6 +59,15 @@ class ROBOT:
 
     def Think(self):
         self.nn.Update()
-        self.nn.Print()
+        # self.nn.Print()
+
+    def Get_Fitness(self):
+        robot_info = p.getLinkState(self.robotId, 0)
+        positionOfLink0 = robot_info[0]
+        with open(f"fitness{self.simId}.txt", "w") as f:
+            f.write(str(positionOfLink0[0]))
+
+
+
 
 

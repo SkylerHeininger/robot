@@ -9,16 +9,20 @@ import numpy
 
 
 class SIMULATION:
-    def __init__(self):
-
-        self.physicsClient = p.connect(p.GUI)
+    def __init__(self, directOrGUI, simulationID):
+        if directOrGUI == "GUI":
+            self.physicsClient = p.connect(p.GUI)
+            self.GUI = True
+        else:
+            self.physicsClient = p.connect(p.DIRECT)
+            self.GUI = False
 
         # p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
         p.setGravity(0, 0, c.GRAVITY)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
         self.world = WORLD(p)
-        self.robot = ROBOT(2, 2, p)
+        self.robot = ROBOT(2, 2, p, simulationID)
 
         self.run()
 
@@ -29,11 +33,15 @@ class SIMULATION:
             self.robot.Think()
             self.robot.Act(i)
             # print(backLegTouch)
-            time.sleep(1 / 60)
+            if self.GUI:
+                time.sleep(1 / 60)
             # print(i)
 
         # self.robot.Save_Sense()
 
     def __del__(self):
         p.disconnect()
+
+    def Get_Fitness(self):
+        self.robot.Get_Fitness()
 

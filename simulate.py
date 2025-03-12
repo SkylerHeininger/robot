@@ -7,9 +7,13 @@ import random
 import math
 import constants as c
 from simulation import SIMULATION
+import sys
 
+directorgui = sys.argv[1]
+simulationID = sys.argv[2]
 
-simulation = SIMULATION()
+simulation = SIMULATION(directorgui, simulationID)
+simulation.Get_Fitness()
 
 #
 # physicsClient = p.connect(p.GUI)
