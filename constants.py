@@ -12,5 +12,5 @@ BACK_A = math.pi / 4
 BACK_F = 10 / (ITERATIONS / (2 * math.pi))
 BACK_P = 0
 
-numberOfGenerations = 25
+numberOfGenerations = 10
 populationSize = 10

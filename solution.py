@@ -25,6 +25,7 @@ class SOLUTION():
         with open(fitnessFileName, "r") as f:
             self.fitness = float(f.read())
         os.system(f"del {fitnessFileName}")
+        # print(f"Fitness: {self.fitness}")
 
     def Create_World(self):
         pyrosim.Start_SDF(f"world.sdf")
