@@ -7,6 +7,7 @@ import random
 import math
 import constants as c
 from simulation import SIMULATION
+from solution import SOLUTION
 import sys
 
 directorgui = sys.argv[1]

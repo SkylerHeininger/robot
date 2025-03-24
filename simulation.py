@@ -27,6 +27,7 @@ class SIMULATION:
         self.run()
 
     def run(self):
+
         for i in range(0, c.ITERATIONS):
             p.stepSimulation()
             self.robot.Sense(i)
@@ -37,7 +38,7 @@ class SIMULATION:
                 time.sleep(1 / 60)
             # print(i)
 
-        # self.robot.Save_Sense()
+        self.robot.Save_Sense()
 
     def __del__(self):
         p.disconnect()

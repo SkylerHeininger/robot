@@ -4,10 +4,11 @@ import pyrosim.pyrosim as pyrosim
 
 
 class SENSOR:
-    def __init__(self, linkName):
+    def __init__(self, linkName, simId):
         self.linkName = linkName
         self.values = None
         self.Prepare_To_Sense()
+        self.simId = simId
         # print(self.values)
 
     def Prepare_To_Sense(self):
@@ -20,5 +21,5 @@ class SENSOR:
         #     print(self.values)
 
     def Save_Values(self):
-        numpy.save(f"data/{self.linkName}.npy", self.values)
+        numpy.save(f"data/{self.linkName}_{self.simId}.npy", self.values)
 

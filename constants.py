@@ -12,5 +12,10 @@ BACK_A = math.pi / 4
 BACK_F = 10 / (ITERATIONS / (2 * math.pi))
 BACK_P = 0
 
-numberOfGenerations = 10
+numberOfGenerations = 20
 populationSize = 10
+
+numSensorNeurons = 9
+numMotorNeurons = 8
+
+motorJointRange = 0.4
