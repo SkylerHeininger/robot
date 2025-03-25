@@ -21,14 +21,31 @@ class SOLUTION():
 
     def Wait_For_Simulation_To_End(self):
         fitnessFileName = f"fitness{self.myId}.txt"
+        maxHeightFileName = f"height_{self.myId}.txt"
         while not os.path.exists(fitnessFileName):
             time.sleep(0.01)
         with open(fitnessFileName, "r") as f:
             lines = f.readlines()
             xpos = float(lines[0].strip())
-            jump_fitness = float(lines[1].strip())
-            self.fitness = -xpos * jump_fitness
+            avg_air_time = float(lines[1].strip())
+            avg_ground_time = float(lines[2].strip())
+            num_jumps = float(lines[3].strip())
+            prop_non_touching = float(lines[4].strip())
+
+        with open(maxHeightFileName, "r") as f:
+            lines = f.readlines()
+            max_height = float(lines[0])
+
+        # Avoid div by 0 or multing by 0
+        if num_jumps == 0:
+            num_jumps = 1
+
+        # self.fitness = -5 * xpos - 10 * prop_non_touching + max_height + avg_air_time - avg_ground_time / 4
+        print(num_jumps)
+        self.fitness = -5 * xpos - 10 * prop_non_touching + max_height * avg_air_time * num_jumps - avg_ground_time / 2
+
         os.system(f"del {fitnessFileName}")
+        os.system(f"del {maxHeightFileName}")
         # print(f"Fitness: {self.fitness}")
 
     def Create_World(self):
@@ -136,9 +153,10 @@ class SOLUTION():
         pyrosim.End()
 
     def Mutate(self):
-        row = random.randint(0, c.numSensorNeurons - 1)
-        col = random.randint(0, c.numMotorNeurons - 1)
-        self.weights[row][col] = random.random() * 2 - 1
+        for i in range(c.num_mutations):
+            row = random.randint(0, c.numSensorNeurons - 1)
+            col = random.randint(0, c.numMotorNeurons - 1)
+            self.weights[row][col] = random.random() * 2 - 1
 
     def Set_Id(self, myId):
         self.myId = myId

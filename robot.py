@@ -104,6 +104,7 @@ class ROBOT:
 
         one_periods = []
         zero_periods = []
+        num_non_all_4 = 0
 
         current_one_count = 0
         current_zero_count = 0
@@ -126,6 +127,7 @@ class ROBOT:
                 if current_one_count > 0:
                     one_periods.append(current_one_count)
                     current_one_count = 0
+                num_non_all_4 += 1
 
         # Add any remaining periods that ended at the last element
         if current_zero_count > 0:
@@ -143,14 +145,20 @@ class ROBOT:
         else:
             average_one_period = 0
 
-        print(average_zero_period, average_one_period)
-        # Prioritize time in the air
-        sensor_fitness = average_zero_period
-        print(positionOfLink0[0], sensor_fitness)
+        # Number of jumps that weren't just noise
+        num_jumps = len([count for count in zero_periods if count > 20])
+
+        # Proportion of time without robot touching all four or in air
+        prop_all_4 = num_non_all_4 / c.ITERATIONS
+
+        print(positionOfLink0[0], average_zero_period, average_one_period)
 
         with open(f"fitness{self.simId}.txt", "w") as f:
             f.write(str(positionOfLink0[0]) + "\n")
-            f.write(str(sensor_fitness))
+            f.write(str(average_zero_period) + "\n")
+            f.write(str(average_one_period) + "\n")
+            f.write(str(num_jumps) + "\n")
+            f.write(str(prop_all_4))
 
 
 

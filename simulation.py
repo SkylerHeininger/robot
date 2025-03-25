@@ -24,10 +24,12 @@ class SIMULATION:
         self.world = WORLD(p)
         self.robot = ROBOT(2, 2, p, simulationID)
 
+        self.simId = simulationID
+
         self.run()
 
     def run(self):
-
+        max_jump_height = 0
         for i in range(0, c.ITERATIONS):
             p.stepSimulation()
             self.robot.Sense(i)
@@ -37,8 +39,14 @@ class SIMULATION:
             if self.GUI:
                 time.sleep(1 / 60)
             # print(i)
+            robot_info = p.getBasePositionAndOrientation(self.robot.robotId, 0)
+            positionOfLink0 = robot_info[0][2]
+            if positionOfLink0 > max_jump_height:
+                max_jump_height = positionOfLink0
 
         self.robot.Save_Sense()
+        with open(f"height_{self.simId}.txt", "w") as f:
+            f.write(str(max_jump_height))
 
     def __del__(self):
         p.disconnect()
