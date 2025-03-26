@@ -1,6 +1,6 @@
 import math
 
-ITERATIONS = 500
+ITERATIONS = 1000
 GRAVITY = -9.8
 MAX_FORCE = 40
 
@@ -18,6 +18,6 @@ populationSize = 20
 numSensorNeurons = 9
 numMotorNeurons = 8
 
-motorJointRange = 0.4
+motorJointRange = 0.6
 
 num_mutations = 1

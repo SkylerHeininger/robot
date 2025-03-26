@@ -130,10 +130,11 @@ class ROBOT:
                 num_non_all_4 += 1
 
         # Add any remaining periods that ended at the last element
-        if current_zero_count > 0:
-            zero_periods.append(current_zero_count)
-        if current_one_count > 0:
-            one_periods.append(current_one_count)
+        # Don't add last period to penalize sitting behavior
+        # if current_zero_count > 0:
+        #     zero_periods.append(current_zero_count)
+        # if current_one_count > 0:
+        #     one_periods.append(current_one_count)
 
         if zero_periods:
             average_zero_period = sum(zero_periods) / len(zero_periods)

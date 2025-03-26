@@ -1,4 +1,5 @@
 import os
+import keyboard
 from parallelhillclimber import PARALLEL_HILL_CLIMBER
 
 # for _ in range(5):

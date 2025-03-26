@@ -37,12 +37,18 @@ class SOLUTION():
             max_height = float(lines[0])
 
         # Avoid div by 0 or multing by 0
-        if num_jumps == 0:
-            num_jumps = 1
+        # if num_jumps == 0:
+        #     num_jumps = 1
+
+        # Milestone 2 fitness function
+        self.fitness = avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
+
+        # Milestone 3 fitness function
+        self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
         # self.fitness = -5 * xpos - 10 * prop_non_touching + max_height + avg_air_time - avg_ground_time / 4
-        print(num_jumps)
-        self.fitness = -5 * xpos - 10 * prop_non_touching + max_height * avg_air_time * num_jumps - avg_ground_time / 2
+        # print(num_jumps)
+        # self.fitness = -10 * xpos - 5 * prop_non_touching # + max_height * avg_air_time * num_jumps + avg_ground_time * num_jumps / 4
 
         os.system(f"del {fitnessFileName}")
         os.system(f"del {maxHeightFileName}")
