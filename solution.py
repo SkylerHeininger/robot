@@ -17,7 +17,7 @@ class SOLUTION():
         self.Generate_Body()
         self.Generate_Brain()
         # os.system(f"venv\\Scripts\\python simulate.py {directOrGUI} &")
-        os.system("start /B venv\\Scripts\\python simulate.py " + directOrGUI + " " + str(self.myId) + " &")
+        os.system("../miniconda3/envs/evo/bin/python simulate.py " + directOrGUI + " " + str(self.myId) + " &")
 
     def Wait_For_Simulation_To_End(self):
         fitnessFileName = f"fitness{self.myId}.txt"
@@ -41,10 +41,16 @@ class SOLUTION():
         #     num_jumps = 1
 
         # Milestone 2 fitness function
-        self.fitness = avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
+        # self.fitness = avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
         # Milestone 3 fitness function
+        # self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
+
+        # Milestone 4 A fitness function
         self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
+
+        # Milestone 4 B fitness function
+        # self.fitness = -5 * xpos * max_height * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
         # self.fitness = -5 * xpos - 10 * prop_non_touching + max_height + avg_air_time - avg_ground_time / 4
         # print(num_jumps)
@@ -53,6 +59,8 @@ class SOLUTION():
         os.system(f"del {fitnessFileName}")
         os.system(f"del {maxHeightFileName}")
         # print(f"Fitness: {self.fitness}")
+
+        return -xpos
 
     def Create_World(self):
         pyrosim.Start_SDF(f"world.sdf")

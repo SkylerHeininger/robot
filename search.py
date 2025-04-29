@@ -1,5 +1,4 @@
 import os
-import keyboard
 from parallelhillclimber import PARALLEL_HILL_CLIMBER
 
 # for _ in range(5):
@@ -11,5 +10,6 @@ gc.collect()
 
 phc = PARALLEL_HILL_CLIMBER()
 phc.Evolve()
-phc.Show_Best()
+# phc.Show_Best()
+phc.Save_Best()
 

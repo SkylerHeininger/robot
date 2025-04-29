@@ -2,6 +2,8 @@ from solution import SOLUTION
 import os
 import constants as c
 import copy
+import numpy as np
+import pickle
 
 
 class PARALLEL_HILL_CLIMBER():
@@ -16,6 +18,9 @@ class PARALLEL_HILL_CLIMBER():
             self.parents[i] = SOLUTION(self.nextAvailableID)
             self.nextAvailableID += 1
 
+        self.matr = np.zeros((c.numberOfGenerations, c.populationSize))
+        self.generation = 0
+
     def Evolve(self):
         # self.parent.Evaluate("GUI")
 
@@ -28,8 +33,11 @@ class PARALLEL_HILL_CLIMBER():
         self.Evaluate(self.parents)
 
         for gen in range(c.numberOfGenerations):
+            self.generation = gen
             self.Evolve_For_One_Generation()
             self.Print()
+
+        np.savetxt("A.csv", self.matr, delimiter=",")
 
     def Evolve_For_One_Generation(self):
         self.Spawn()
@@ -69,12 +77,18 @@ class PARALLEL_HILL_CLIMBER():
         min_fitness_parent.Start_Simulation("GUI")
         min_fitness_parent.Wait_For_Simulation_To_End()
 
+    def Save_Best(self):
+        best = max(self.parents.values(), key=lambda p: p.fitness)
+        with open("best_robot.pkl", "wb") as f:
+            pickle.dump(best, f)
 
     def Evaluate(self, solutions):
         for solution_key in solutions.keys():
             solutions[solution_key].Start_Simulation("DIRECT")
 
-        for solution_key in solutions.keys():
-            solutions[solution_key].Wait_For_Simulation_To_End()
+        for idx, solution_key in enumerate(solutions.keys()):
+            temp = solutions[solution_key].Wait_For_Simulation_To_End()
+            self.matr[self.generation, idx] = temp
+
 
 

@@ -6,7 +6,6 @@ import pybullet_data
 import pyrosim.pyrosim as pyrosim
 import constants as c
 import numpy
-import keyboard
 
 
 class SIMULATION:
@@ -18,7 +17,8 @@ class SIMULATION:
             self.physicsClient = p.connect(p.DIRECT)
             self.GUI = False
 
-        # p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
+        p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
+
         p.setGravity(0, 0, c.GRAVITY)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
 
@@ -30,15 +30,15 @@ class SIMULATION:
         self.run()
 
     def run(self):
-        if self.GUI:
-            print("Ready")
-            while True:
-                try:
-                    if keyboard.is_pressed('esc'):
-                        print("Exiting...")
-                        break
-                except:
-                    break
+        # if self.GUI:
+        #     print("Ready")
+        #     while True:
+        #         try:
+        #             if keyboard.is_pressed('esc'):
+        #                 print("Exiting...")
+        #                 break
+        #         except:
+        #             break
         max_jump_height = 0
         for i in range(0, c.ITERATIONS):
             p.stepSimulation()
