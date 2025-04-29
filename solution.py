@@ -4,6 +4,7 @@ import numpy as np
 import pyrosim.pyrosim as pyrosim
 import os
 import constants as c
+import platform
 
 
 class SOLUTION():
@@ -17,18 +18,26 @@ class SOLUTION():
         self.Generate_Body()
         self.Generate_Brain()
         # os.system(f"venv\\Scripts\\python simulate.py {directOrGUI} &")
-        os.system("../miniconda3/envs/evo/bin/python simulate.py " + directOrGUI + " " + str(self.myId) + " &")
+        if platform.system() == "Windows":
+            os.system("start /B venv\\Scripts\\python simulate.py " + directOrGUI + " " + str(self.myId) + " &")
+        else:
+            os.system("../miniconda3/envs/evo/bin/python simulate.py " + directOrGUI + " " + str(self.myId) + " &")
 
     def Wait_For_Simulation_To_End(self):
         fitnessFileName = f"fitness{self.myId}.txt"
         maxHeightFileName = f"height_{self.myId}.txt"
-        while not os.path.exists(fitnessFileName):
+        while not os.path.exists(fitnessFileName) or os.path.getsize(fitnessFileName) == 0:
             time.sleep(0.01)
         with open(fitnessFileName, "r") as f:
             lines = f.readlines()
             xpos = float(lines[0].strip())
-            avg_air_time = float(lines[1].strip())
-            avg_ground_time = float(lines[2].strip())
+            # avg_air_time = float(lines[1].strip())
+            # avg_ground_time = float(lines[2].strip())
+
+            # I think this is what it should be
+            avg_ground_time = float(lines[1].strip())
+            avg_air_time = float(lines[2].strip())
+
             num_jumps = float(lines[3].strip())
             prop_non_touching = float(lines[4].strip())
 
@@ -47,20 +56,27 @@ class SOLUTION():
         # self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
         # Milestone 4 A fitness function
-        self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
+        # self.fitness = -5 * xpos * avg_air_time * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
         # Milestone 4 B fitness function
         # self.fitness = -5 * xpos * max_height * num_jumps - 10 * prop_non_touching + avg_ground_time * num_jumps / 4
 
-        # self.fitness = -5 * xpos - 10 * prop_non_touching + max_height + avg_air_time - avg_ground_time / 4
-        # print(num_jumps)
-        # self.fitness = -10 * xpos - 5 * prop_non_touching # + max_height * avg_air_time * num_jumps + avg_ground_time * num_jumps / 4
+        # Final project fitness function A
+        self.fitness = -xpos * num_jumps * (avg_air_time + avg_ground_time / 4)
 
-        os.system(f"del {fitnessFileName}")
-        os.system(f"del {maxHeightFileName}")
+        # Final project fitness function B
+        # self.fitness = -xpos * num_jumps * (avg_air_time + avg_ground_time / 4 - 10 * prop_non_touching)
+
+        # print(num_jumps)
+        if platform.system() == "Windows":
+            os.system(f"del {fitnessFileName}")
+            os.system(f"del {maxHeightFileName}")
+        else:
+            os.system(f"rm {fitnessFileName}")
+            os.system(f"rm {maxHeightFileName}")
         # print(f"Fitness: {self.fitness}")
 
-        return -xpos
+        return -xpos * num_jumps * avg_air_time
 
     def Create_World(self):
         pyrosim.Start_SDF(f"world.sdf")
@@ -70,7 +86,7 @@ class SOLUTION():
         pyrosim.End()
 
     def Generate_Body(self):
-        pyrosim.Start_URDF(f"body.urdf")
+        pyrosim.Start_URDF(f"body{self.myId}.urdf")
         pyrosim.Send_Cube(name="Torso", pos=[0, 0, 1], size=[1, 1, 1])
         pyrosim.Send_Cube(name="BackRightLeg", pos=[0.5, -0.5, 0], size=[1, 0.2, 0.2])
         pyrosim.Send_Cube(name="BackLeftLeg", pos=[-0.5, -0.5, 0], size=[1, 0.2, 0.2])
@@ -122,34 +138,34 @@ class SOLUTION():
     def Generate_Brain(self):
         pyrosim.Start_NeuralNetwork(f"brain{self.myId}.nndf")
 
-        pyrosim.Send_Sensor_Neuron(name=0, linkName="Torso")
-        pyrosim.Send_Sensor_Neuron(name=1, linkName="BackRightLeg")
-        pyrosim.Send_Sensor_Neuron(name=2, linkName="BackLeftLeg")
-
-        pyrosim.Send_Sensor_Neuron(name=3, linkName="FrontRightLeg")
-        pyrosim.Send_Sensor_Neuron(name=4, linkName="FrontLeftLeg")
+        # pyrosim.Send_Sensor_Neuron(name=0, linkName="Torso")
+        # pyrosim.Send_Sensor_Neuron(name=1, linkName="BackRightLeg")
+        # pyrosim.Send_Sensor_Neuron(name=2, linkName="BackLeftLeg")
+        #
+        # pyrosim.Send_Sensor_Neuron(name=3, linkName="FrontRightLeg")
+        # pyrosim.Send_Sensor_Neuron(name=4, linkName="FrontLeftLeg")
 
         # pyrosim.Send_Sensor_Neuron(name=3, linkName="LeftLeg")
         # pyrosim.Send_Sensor_Neuron(name=4, linkName="RightLeg")
-        pyrosim.Send_Sensor_Neuron(name=5, linkName="LowerBackRightLeg")
-        pyrosim.Send_Sensor_Neuron(name=6, linkName="LowerBackLeftLeg")
+        pyrosim.Send_Sensor_Neuron(name=0, linkName="LowerBackRightLeg")
+        pyrosim.Send_Sensor_Neuron(name=1, linkName="LowerBackLeftLeg")
 
-        pyrosim.Send_Sensor_Neuron(name=7, linkName="LowerFrontRightLeg")
-        pyrosim.Send_Sensor_Neuron(name=8, linkName="LowerFrontLeftLeg")
+        pyrosim.Send_Sensor_Neuron(name=2, linkName="LowerFrontRightLeg")
+        pyrosim.Send_Sensor_Neuron(name=3, linkName="LowerFrontLeftLeg")
         # pyrosim.Send_Sensor_Neuron(name=7, linkName="LowerLeftLeg")
         # pyrosim.Send_Sensor_Neuron(name=8, linkName="LowerRightLeg")
 
-        pyrosim.Send_Motor_Neuron(name=9, jointName="Torso_BackRightLeg")
-        pyrosim.Send_Motor_Neuron(name=10, jointName="Torso_BackLeftLeg")
+        pyrosim.Send_Motor_Neuron(name=4, jointName="Torso_BackRightLeg")
+        pyrosim.Send_Motor_Neuron(name=5, jointName="Torso_BackLeftLeg")
 
-        pyrosim.Send_Motor_Neuron(name=11, jointName="Torso_FrontRightLeg")
-        pyrosim.Send_Motor_Neuron(name=12, jointName="Torso_FrontLeftLeg")
+        pyrosim.Send_Motor_Neuron(name=6, jointName="Torso_FrontRightLeg")
+        pyrosim.Send_Motor_Neuron(name=7, jointName="Torso_FrontLeftLeg")
 
-        pyrosim.Send_Motor_Neuron(name=13, jointName="BackLeftLeg_LowerBackLeftLeg")
-        pyrosim.Send_Motor_Neuron(name=14, jointName="BackRightLeg_LowerBackRightLeg")
+        pyrosim.Send_Motor_Neuron(name=8, jointName="BackLeftLeg_LowerBackLeftLeg")
+        pyrosim.Send_Motor_Neuron(name=9, jointName="BackRightLeg_LowerBackRightLeg")
 
-        pyrosim.Send_Motor_Neuron(name=15, jointName="FrontRightLeg_LowerFrontRightLeg")
-        pyrosim.Send_Motor_Neuron(name=16, jointName="FrontLeftLeg_LowerFrontLeftLeg")
+        pyrosim.Send_Motor_Neuron(name=10, jointName="FrontRightLeg_LowerFrontRightLeg")
+        pyrosim.Send_Motor_Neuron(name=11, jointName="FrontLeftLeg_LowerFrontLeftLeg")
 
 
         # pyrosim.Send_Motor_Neuron(name=11, jointName="Torso_LeftLeg")

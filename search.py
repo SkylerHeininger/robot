@@ -1,5 +1,6 @@
 import os
 from parallelhillclimber import PARALLEL_HILL_CLIMBER
+import platform
 
 # for _ in range(5):
 #     os.system("venv\\Scripts\\python generate.py")
@@ -10,6 +11,8 @@ gc.collect()
 
 phc = PARALLEL_HILL_CLIMBER()
 phc.Evolve()
-# phc.Show_Best()
-phc.Save_Best()
+if platform.system() == "Windows":
+    phc.Show_Best()
+else:
+    phc.Save_Best()
 

@@ -3,5 +3,5 @@ class WORLD:
         self.p = p
 
         self.planeId = self.p.loadURDF("plane.urdf")
-        self.p.loadSDF("world.sdf")
+        # self.p.loadSDF("world.sdf")
 

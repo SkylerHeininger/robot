@@ -11,6 +11,9 @@ import constants as c
 from pyrosim.neuralNetwork import NEURAL_NETWORK
 import numpy as np
 import pandas as pd
+import platform
+import time
+import shutil
 
 
 class ROBOT:
@@ -20,9 +23,16 @@ class ROBOT:
         self.motors = {}
         self.nn = NEURAL_NETWORK(f"brain{simulationID}.nndf")
         self.simId = simulationID
-        os.system(f"del brain{simulationID}.nndf")
+        if platform.system() == "Windows":
+            os.system(f"del brain{simulationID}.nndf")
+        else:
+            os.system(f"rm brain{simulationID}.nndf")
 
-        self.robotId = self.p.loadURDF("body.urdf")
+        self.robotId = self.p.loadURDF(f"body{simulationID}.urdf")
+        if platform.system() == "Windows":
+            os.system(f"del body{simulationID}.urdf")
+        else:
+            os.system(f"rm body{simulationID}.urdf")
 
         pyrosim.Prepare_To_Simulate(self.robotId)
 
@@ -80,7 +90,10 @@ class ROBOT:
 
         for file in sensor_files:
             if os.path.exists(file):
-                os.system(f"del {file}")
+                if platform.system() == "Windows":
+                    os.system(f"del {file}")
+                else:
+                    os.system(f"rm {file}")
             else:
                 print(f"File {file} not found.")
 
@@ -110,12 +123,12 @@ class ROBOT:
         current_zero_count = 0
 
         for avg in averages:
-            if avg == -1:
+            if avg == -1: # AIR
                 if current_one_count > 0:
                     one_periods.append(current_one_count)
                     current_one_count = 0
                 current_zero_count += 1
-            elif avg == 1:
+            elif avg == 1: # GROUND
                 if current_zero_count > 0:
                     zero_periods.append(current_zero_count)
                     current_zero_count = 0
@@ -147,12 +160,14 @@ class ROBOT:
             average_one_period = 0
 
         # Number of jumps that weren't just noise
-        num_jumps = len([count for count in zero_periods if count > 20])
+        # num_jumps = len([count for count in zero_periods if count > 20])
+        # Should be this
+        num_jumps = len([count for count in one_periods if count > 20])
 
         # Proportion of time without robot touching all four or in air
         prop_all_4 = num_non_all_4 / c.ITERATIONS
 
-        print(positionOfLink0[0], average_zero_period, average_one_period)
+        # print(positionOfLink0[0], average_zero_period, average_one_period)
 
         with open(f"fitness{self.simId}.txt", "w") as f:
             f.write(str(positionOfLink0[0]) + "\n")
@@ -160,7 +175,7 @@ class ROBOT:
             f.write(str(average_one_period) + "\n")
             f.write(str(num_jumps) + "\n")
             f.write(str(prop_all_4))
-
+        # print("Through")
 
 
 

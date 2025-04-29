@@ -4,12 +4,21 @@ import constants as c
 import copy
 import numpy as np
 import pickle
+import platform
 
 
 class PARALLEL_HILL_CLIMBER():
     def __init__(self):
-        os.system("del brain*.nndf")
-        os.system("del fitness*.txt")
+        if platform.system() == "Windows":
+            print("Windows", flush=True)
+            os.system("del brain*.nndf")
+            os.system("del body*.urdf")
+            os.system("del fitness*.txt")
+        else:
+            print("Linux", flush=True)
+            os.system("rm brain*.nndf")
+            os.system("rm body*.urdf")
+            os.system("rm fitness*.txt")
 
         self.parents = {}
         self.children = {}
@@ -19,6 +28,7 @@ class PARALLEL_HILL_CLIMBER():
             self.nextAvailableID += 1
 
         self.matr = np.zeros((c.numberOfGenerations, c.populationSize))
+        self.parent_scores = [0] * c.populationSize
         self.generation = 0
 
     def Evolve(self):
@@ -30,20 +40,21 @@ class PARALLEL_HILL_CLIMBER():
         # for parent_key in self.parents.keys():
         #     self.parents[parent_key].Wait_For_Simulation_To_End()
 
-        self.Evaluate(self.parents)
+        self.Evaluate(self.parents, parent=True)
 
         for gen in range(c.numberOfGenerations):
+            print(f"GENERATION: {self.generation}", flush=True)
             self.generation = gen
             self.Evolve_For_One_Generation()
-            self.Print()
+            # self.Print()
 
         np.savetxt("A.csv", self.matr, delimiter=",")
 
     def Evolve_For_One_Generation(self):
         self.Spawn()
         self.Mutate()
-        self.Evaluate(self.children)
-        self.Select()
+        scores = self.Evaluate(self.children)
+        self.Select(scores)
 
     def Spawn(self):
         self.children = {}
@@ -56,12 +67,15 @@ class PARALLEL_HILL_CLIMBER():
         for child_key in self.children.keys():
             self.children[child_key].Mutate()
 
-    def Select(self):
-        for parent_key in self.parents.keys():
+    def Select(self, scores):
+        for idx, parent_key in enumerate(self.parents.keys()):
             parent = self.parents[parent_key]
             child = self.children[parent_key]
             if child.fitness > parent.fitness:
                 self.parents[parent_key] = self.children[parent_key]
+                self.parent_scores[idx] = scores[idx]
+
+            self.matr[self.generation, idx] = self.parent_scores[idx]
 
     def Print(self):
         for parent_key in self.parents.keys():
@@ -82,13 +96,18 @@ class PARALLEL_HILL_CLIMBER():
         with open("best_robot.pkl", "wb") as f:
             pickle.dump(best, f)
 
-    def Evaluate(self, solutions):
+    def Evaluate(self, solutions, parent=False):
         for solution_key in solutions.keys():
             solutions[solution_key].Start_Simulation("DIRECT")
 
+        scores = []
         for idx, solution_key in enumerate(solutions.keys()):
             temp = solutions[solution_key].Wait_For_Simulation_To_End()
-            self.matr[self.generation, idx] = temp
+            scores.append(temp)
+            if parent:
+                self.parent_scores[idx] = temp
+
+        return scores
 
 
 
